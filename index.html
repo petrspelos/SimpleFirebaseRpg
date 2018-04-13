@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>title</title>
+  <link rel="stylesheet" href="stylesheet.css" type="text/css">
+  </head>
+  <body>
+    <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+          apiKey: "AIzaSyCkKIYmunt7-LrSBPF10I04NnwncqQSHjI",
+          authDomain: "simplerpg-eb8f6.firebaseapp.com",
+          databaseURL: "https://simplerpg-eb8f6.firebaseio.com",
+          projectId: "simplerpg-eb8f6",
+          storageBucket: "simplerpg-eb8f6.appspot.com",
+          messagingSenderId: "126035310758"
+      };
+      firebase.initializeApp(config);
+      const auth = firebase.auth();
+
+      auth.onAuthStateChanged(firebaseUser => {
+        // user logged in or out (if logout user is null)
+        console.log("User's login status changed.");
+        if(firebaseUser) {
+          console.log(firebaseUser);
+        } else {
+          console.log('Not logged in.');
+        }
+      });
+
+      function login(email, password) {
+        const promise = auth.signInWithEmailAndPassword(email, password);
+        promise.catch(e => console.log(e.message));
+      }
+
+      function register(email, password) {
+        auth.createUserWithEmailAndPassword(email, password);
+      }
+
+      function logout() {
+        auth.signOut();
+      }
+    </script>
+  </body>
+</html>

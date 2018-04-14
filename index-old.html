@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/main.css" type="text/css">
+  </head>
+  <body style="min-height: 100%; background-color: #303030;">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script>
+      function defaultImage(img) {
+        $img = $(img);
+        $img.attr("src", "https://topmops.net/wp-content/uploads/2017/01/avatar-placeholder-generic.jpg");
+      }
+    </script>
+
+<div class="container">
+    <div class="row justify-content-md-center align-items-center" style="height: 100%;">
+        <div class="card enemy-card playing">
+            <img class="card-img-top" src="https://www.fantasyflightgames.com/media/ffg_content/wfrp/enemy-within/the-black-cowl.png" alt="Card image cap" onerror="defaultImage(this);">
+            <div class="card-body">
+              <h5 class="card-title">Evil enemy</h5>
+              <div class="progress"><div class="progress-bar" role="progressbar" style="width: 25%; background-color: green;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div></div>
+            </div>
+          </div>
+
+
+
+          <div class="card enemy-card">
+              <img class="card-img-top" src="https://i.pinimg.com/originals/4d/57/fe/4d57fe85744a9ff05b2a256836ed4460.jpg" alt="Card image cap" onerror="defaultImage(this);">
+              <div class="card-body">
+                <h5 class="card-title">Evil enemy</h5>
+                <div class="progress"><div class="progress-bar" role="progressbar" style="width: 25%; background-color: green;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div></div>
+              </div>
+            </div>
+
+
+
+          
+    </div>
+
+
+    <div class="row justify-content-md-center align-items-center" style="height: 100%;">
+      <div style="width: 50px; height: 150px;"></div>
+    </div>
+
+
+
+
+
+
+    <div class="row justify-content-md-center align-items-center" style="height: 100%;">
+      <div class="col col-lg-6">
+
+
+<div class="card hero-card playing">
+    <span class="badge badge-pill badge-info" style="position: fixed;">YOU</span>
+    <img id="avatar" class="card-img-top" src="" alt="Card image cap" onerror="defaultImage(this);">
+    <div class="card-body">
+      <h5 id="username" class="card-title">Card title</h5>
+      <div class="progress"><div id="health" class="progress-bar" role="progressbar" style="width: 25%; background-color: green;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div></div>
+    </div>
+  </div>
+
+    
+    
+    <div id="charList">
+
+    </div>
+
+
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script>
+      var game = {};
+
+      // Initialize Firebase
+      var config = {
+          apiKey: "AIzaSyCkKIYmunt7-LrSBPF10I04NnwncqQSHjI",
+          authDomain: "simplerpg-eb8f6.firebaseapp.com",
+          databaseURL: "https://simplerpg-eb8f6.firebaseio.com",
+          projectId: "simplerpg-eb8f6",
+          storageBucket: "simplerpg-eb8f6.appspot.com",
+          messagingSenderId: "126035310758"
+      };
+      firebase.initializeApp(config);
+      const auth = firebase.auth();
+
+      auth.onAuthStateChanged(firebaseUser => {
+        // user logged in or out (if logout user is null)
+        console.log("User's login status changed.");
+        if(firebaseUser) {
+          
+          startCharactersWatch(firebaseUser);
+
+        } else {
+          console.log('Not logged in.');
+        }
+      });
+
+      function setMyChar(character) {
+        $("#avatar").attr("src", character.avatarURL);
+        $("#username").text(character.name);
+        $("#health").attr("style", "width: " + character.health + "%; background-color: green;");
+      }
+
+      function startCharactersWatch(firebaseUser) {
+          const charactersRefObj = firebase.database().ref().child('characters');
+          charactersRefObj.on("value", function(snapshot) {
+            $("#charList").empty();
+            snapshot.forEach(function(character) {
+              let c = character.val();
+              if(c.uid == firebase.auth().currentUser.uid) {
+                game.characterDbKey = character.key;
+                setMyChar(c);
+              } else {
+                $("#charList").append("<div class='card hero-card'><img class='card-img-top' src='" + c.avatarURL + "'><div class='card-body'><h5 class='card-title'>" + c.name + "</h5><div class='progress'><div id='health' class='progress-bar' role='progressbar' style='width: " + c.health + "%; background-color: green;' aria-valuenow='25' aria-valuemin='0' aria-valuemax='100'></div></div></div></div>");
+              }
+            });
+          });
+
+          // charactersRefObj.orderByChild('uid').equalTo(firebase.auth().currentUser.uid).on("value", function(snapshot) {
+          //     console.log("Your character info updated.");
+          //     snapshot.forEach(function(data) {
+          //       game.character = data.val();
+          //       game.characterDbKey = data.key;
+          //       $("#avatar").attr("src", game.character.avatarURL);
+          //       $("#username").text(game.character.name);
+          //     });
+          // });
+      }
+
+      function login(email, password) {
+        const promise = auth.signInWithEmailAndPassword(email, password);
+        promise.catch(e => console.log(e.message));
+      }
+
+      function register(email, password) {
+        auth.createUserWithEmailAndPassword(email, password)
+          .then(function(user) {
+            user.updateProfile({ displayName: "anonymous" });
+            const rootRef = firebase.database().ref().child("characters");
+            let newChar = {
+              uid: firebase.auth().currentUser.uid,
+              name: "nobody",
+              avatarURL: "http://nd04.jxs.cz/728/677/638c91f645_72771180_o2.jpg",
+              health: 100
+            };
+            rootRef.push(newChar);
+          });
+      }
+
+      function logout() {
+        auth.signOut();
+      }
+
+      // Reference
+      const dbRefObject = firebase.database().ref().child('object');
+
+      // Sync object changes
+      dbRefObject.on('value', snap => console.log(snap.val()));
+
+      // PROFILE EDITS
+      function updateCharacterName(newName) {
+        const charactersRefObj = firebase.database().ref().child('characters');
+        let data = {};
+        data[game.characterDbKey + '/name'] = newName;
+        charactersRefObj.update(data);
+      }
+
+      function updateAvatarUrl(newUrl) {
+        const charactersRefObj = firebase.database().ref().child('characters');
+        let data = {};
+        data[game.characterDbKey + '/avatarURL'] = newUrl;
+        charactersRefObj.update(data);
+      }
+
+    </script>
+  </body>
+</html>

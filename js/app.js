@@ -22,18 +22,23 @@ const charactersRefObj = firebase.database().ref().child('characters');
 auth.onAuthStateChanged(firebaseUser => {
   // Login status changed
   if(firebaseUser) {
-    $loginMessage.text("Logged in.");
+    $loginMessage.html("Logged in. <button class=\"btn btn-danger\" onclick=\"logout();\">Logout</button>");
     userId = firebase.auth().currentUser.uid;
     $loginStatusCard.addClass("border-success");
     registerWatchers();
   } else {
     $loginMessage.text("Not logged in.");
+    $loginStatusCard.removeClass("border-success");
   }
 });
 
 function login(email, password) {
   const promise = auth.signInWithEmailAndPassword(email, password);
   promise.catch(e => console.log(e.message));
+}
+
+function logout() {
+  auth.signOut();
 }
 
 function register(email, password) {
@@ -88,4 +93,11 @@ function updateUserCharacterAttribute(attributeName, newValue) {
   let data = {};
   data[firebase.auth().currentUser.uid + '/' + attributeName] = newValue;
   charactersRefObj.update(data);
+}
+
+// DOM Constructor
+function getButton(name, onclick, classes = "") {
+  console.log("<button class=\"btn " + classes + "\" onclick=\"" + onclick + "\">" + name + "</button>");
+  return
+    "<button class=\"btn " + classes + "\" onclick=\"" + onclick + "\">" + name + "</button>";
 }

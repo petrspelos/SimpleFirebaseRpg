@@ -15,6 +15,7 @@ let $loginStatusCard = $("#login-status-card");
 let $loginMessage = $("#login-message");
 let $usernameTag = $("#username-tag");
 let $useravatarTag = $("#useravatar-tag");
+let $usergoldTag = $("#usergold-tag");
 
 // Firebase object references
 const charactersRefObj = firebase.database().ref().child('characters');
@@ -77,6 +78,7 @@ function onAnyCharacterChanged(snapshot) {
 // UI
 function loadUserCharacter(character) {
   $usernameTag.text(character.name);
+  $usergoldTag.text(character.gold);
   $useravatarTag.attr("src", character.avatarURL);
 }
 
